@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Mobile Store</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .mobile-form, .mobile-list, .search-section {
+            margin-bottom: 20px;
+        }
+        .mobile-form input, .search-section input {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .mobile-form button, .search-section button {
+            padding: 10px 15px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .mobile-form button:hover, .search-section button:hover {
+            background-color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .no-mobiles {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Advanced Mobile Store</h1>
+    </header>
+    <main>
+        <!-- Add Mobile Section -->
+        <section class="mobile-form">
+            <h2>Add New Mobile</h2>
+            <input type="text" id="brand" placeholder="Brand" required>
+            <input type="text" id="model" placeholder="Model" required>
+            <input type="number" id="price" placeholder="Price" required>
+            <input type="number" id="stock" placeholder="Stock" required>
+            <button onclick="addMobile()">Add Mobile</button>
+        </section>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <h2>Search Mobiles</h2>
+            <input type="text" id="search" placeholder="Search by Brand or Model">
+            <button onclick="searchMobile()">Search</button>
+        </section>
+
+        <!-- Mobile List -->
+        <section class="mobile-list">
+            <h2>Mobile Inventory</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Brand</th>
+                        <th>Model</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="mobileTable">
+                    <tr class="no-mobiles">
+                        <td colspan="6">No mobiles available</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        let mobiles = [];
+        let idCounter = 1;
+
+        // Function to add a new mobile
+        function addMobile() {
+            const brand = document.getElementById('brand').value;
+            const model = document.getElementById('model').value;
+            const price = parseFloat(document.getElementById('price').value);
+            const stock = parseInt(document.getElementById('stock').value);
+
+            if (!brand || !model || isNaN(price) || isNaN(stock)) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            const newMobile = { id: idCounter++, brand, model, price, stock };
+            mobiles.push(newMobile);
+
+            document.getElementById('brand').value = '';
+            document.getElementById('model').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('stock').value = '';
+
+            updateTable();
+        }
+
+        // Function to update the table
+        function updateTable() {
+            const table = document.getElementById('mobileTable');
+            table.innerHTML = '';
+
+            if (mobiles.length === 0) {
+                const noMobilesRow = `<tr class="no-mobiles"><td colspan="6">No mobiles available</td></tr>`;
+                table.innerHTML = noMobilesRow;
+                return;
+            }
+
+            mobiles.forEach(mobile => {
+                const row = `
+                    <tr>
+                        <td>${mobile.id}</td>
+                        <td>${mobile.brand}</td>
+                        <td>${mobile.model}</td>
+                        <td>${mobile.price.toFixed(2)}</td>
+                        <td>${mobile.stock}</td>
+                        <td>
+                            <button onclick="deleteMobile(${mobile.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                table.innerHTML += row;
+            });
+        }
+
+        // Function to delete a mobile
+        function deleteMobile(id) {
+            mobiles = mobiles.filter(mobile => mobile.id !== id);
+            updateTable();
+        }
+
+        // Function to search mobiles
+        function searchMobile() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const filteredMobiles = mobiles.filter(mobile =>
+                mobile.brand.toLowerCase().includes(query) ||
+                mobile.model.toLowerCase().includes(query)
+            );
+
+            const table = document.getElementById('mobileTable');
+            table.innerHTML = '';
+
+            if (filteredMobiles.length === 0) {
+                const noMobilesRow = `<tr class="no-mobiles"><td colspan="6">No mobiles found</td></tr>`;
+                table.innerHTML = noMobilesRow;
+                return;
+            }
+
+            filteredMobiles.forEach(mobile => {
+                const row = `
+                    <tr>
+                        <td>${mobile.id}</td>
+                        <td>${mobile.brand}</td>
+                        <td>${mobile.model}</td>
+                        <td>${mobile.price.toFixed(2)}</td>
+                        <td>${mobile.stock}</td>
+                        <td>
+                            <button onclick="deleteMobile(${mobile.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                table.innerHTML += row;
+            });
+        }
+    </script>
+</body>
+</html>
